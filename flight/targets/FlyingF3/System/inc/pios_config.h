@@ -85,6 +85,9 @@
 #define PIOS_INCLUDE_FLASH_INTERNAL
 #define PIOS_INCLUDE_LOGFS_SETTINGS
 
+/* Ultrasonar driver */
+#define PIOS_INCLUDE_HCSR04
+
 /* Other Interfaces */
 //#define PIOS_INCLUDE_I2C_ESC
 

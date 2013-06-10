@@ -65,6 +65,12 @@ struct pios_sensor_baro_data {
 	float altitude;
 };
 
+// Sensor structure for generic ultrasonar data
+struct pios_sensor_ultrasonar_data {
+	float altitude;
+	float response_time;
+};
+
 //! The types of sensors this module supports
 enum pios_sensor_type
 {
@@ -72,6 +78,7 @@ enum pios_sensor_type
 	PIOS_SENSOR_GYRO,
 	PIOS_SENSOR_MAG,
 	PIOS_SENSOR_BARO,
+	PIOS_SENSOR_SONAR,
 	PIOS_SENSOR_LAST
 };
 

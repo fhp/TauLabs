@@ -136,6 +136,67 @@ static const struct pios_lsm303_cfg pios_lsm303_cfg = {
 };
 #endif /* PIOS_INCLUDE_LSM303 */
 
+#if defined(PIOS_INCLUDE_HCSR04)
+#include "pios_hcsr04.h"
+static const struct pios_tim_channel pios_tim_sonar = {
+	// PWM1 TIM8_CH3 PC8
+	.timer = TIM3,
+	.timer_chan = TIM_Channel_2,
+	.pin = {
+		.gpio = GPIOB,
+		.init = {
+			.GPIO_Pin = GPIO_Pin_5,
+			.GPIO_Speed = GPIO_Speed_2MHz,
+			.GPIO_Mode  = GPIO_Mode_IN,
+			.GPIO_OType = GPIO_OType_PP,
+			.GPIO_PuPd  = GPIO_PuPd_UP
+		},
+	},
+};
+
+static const struct pios_ultrasonar_trigger pios_usonar_trigger = {
+	.pin = {
+		.gpio = GPIOD,
+		.init = {
+			.GPIO_Pin   = GPIO_Pin_2,
+			.GPIO_Speed = GPIO_Speed_2MHz,
+			.GPIO_Mode  = GPIO_Mode_OUT,
+			.GPIO_OType = GPIO_OType_PP,
+			.GPIO_PuPd = GPIO_PuPd_UP
+		},
+	},
+};
+
+static const TIM_TimeBaseInitTypeDef tim_hcsr04_base = {
+	.TIM_Prescaler = (PIOS_PERIPHERAL_APB1_CLOCK / 1000000) - 1,
+	.TIM_ClockDivision = TIM_CKD_DIV1,
+	.TIM_CounterMode = TIM_CounterMode_Up,
+	.TIM_Period = ((1000000 / PIOS_SERVO_UPDATE_HZ) - 1),
+	.TIM_RepetitionCounter = 0x0000,
+};
+
+
+static const struct pios_tim_clock_cfg pios_tim_hcsr04_cfg = {
+// 	.vector = PIOS_HCSR04_IRQHandler, // TODO: this does not compile. ~Stef Louwers, 10-06-2013
+	.timer = TIM3,
+	.time_base_init = &tim_hcsr04_base,
+	.irq = {
+		.init = {
+			.NVIC_IRQChannel                   = TIM3_IRQn,
+			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID,
+			.NVIC_IRQChannelSubPriority        = 0,
+			.NVIC_IRQChannelCmd                = ENABLE,
+		},
+	},
+};
+
+static const struct pios_hcsr04_cfg pios_hcsr04_cfg = {
+// 	.tim_cfg = &pios_tim_hcsr04_cfg,
+// 	.sonar_tim_channel = &pios_tim_sonar,
+// 	.sonar_trigger_pin = &pios_usonar_trigger,
+};
+
+#endif /* PIOS_INCLUDE_HCSR04 */
 
 /* One slot per selectable receiver group.
  *  eg. PWM, PPM, GCS, SPEKTRUM1, SPEKTRUM2, SBUS

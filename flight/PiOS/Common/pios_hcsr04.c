@@ -32,6 +32,20 @@
 #include "pios.h"
 
 #if defined(PIOS_INCLUDE_HCSR04)
+
+#include "pios_hcsr04.h"
+/* Private constants */
+#define HCSR04_TASK_PRIORITY	(tskIDLE_PRIORITY + configMAX_PRIORITIES - 1)	// max priority
+#define HCSR04_TASK_STACK		(512 / 4)
+
+struct hcsr04_dev {
+	const struct pios_hcsr04_cfg *cfg;
+	xTaskHandle TaskHandle;
+};
+
+#endif
+
+#if defined(PIOS_INCLUDE_HCSR04)
 #if !(defined(PIOS_INCLUDE_DSM) || defined(PIOS_INCLUDE_SBUS))
 #error Only supported with Spektrum/JR DSM or S.Bus interface!
 #endif
@@ -45,23 +59,38 @@ static uint16_t FallValue;
 static uint32_t CaptureValue;
 static uint32_t CapCounter;
 
+/* Device handle */
+static struct hcsr04_dev *pios_hcsr04_dev;
+
 #define PIOS_HCSR04_TRIG_GPIO_PORT                  GPIOD
 #define PIOS_HCSR04_TRIG_PIN                        GPIO_Pin_2
+
+static void PIOS_HCSR04_Task(void *parameters);
 
 /**
 * Initialise the HC-SR04 sensor
 */
-void PIOS_HCSR04_Init(void)
+
+// Modify for cfg struct and device id 
+int32_t PIOS_HCSR04_Init(const struct pios_hcsr04_cfg *hcsr04_cfg)
 {
+// 	struct hcsr04_dev *lsm303_dev;
+
 	/* Init triggerpin */
+#if 0
 	GPIO_InitTypeDef GPIO_InitStructure;
 	GPIO_StructInit(&GPIO_InitStructure);
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_OD;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
 	GPIO_InitStructure.GPIO_Pin = PIOS_HCSR04_TRIG_PIN;
 	GPIO_Init(PIOS_HCSR04_TRIG_GPIO_PORT, &GPIO_InitStructure);
-	PIOS_HCSR04_TRIG_GPIO_PORT->BSRR = PIOS_HCSR04_TRIG_PIN;
 
+	//PIOS_HCSR04_TRIG_GPIO_PORT->BSRR = PIOS_HCSR04_TRIG_PIN;
+#endif
+	hcsr04_cfg->sonar_trigger_pin.pin.gpio->BSRR = hcsr04_cfg->sonar_trigger_pin.pin.init.GPIO_Pin;
+
+	pios_hcsr04_dev->cfg = hcsr04_cfg;
+	
 	/* Flush counter variables */
 	CaptureState = 0;
 	RiseValue = 0;
@@ -72,13 +101,20 @@ void PIOS_HCSR04_Init(void)
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE);
 
 	/* Enable timer interrupts */
+#if 0
 	NVIC_InitTypeDef NVIC_InitStructure;
 	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID;
 	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
 	NVIC_InitStructure.NVIC_IRQChannel = TIM3_IRQn;
 	NVIC_Init(&NVIC_InitStructure);
+#endif
 
+	/* Partial pin remap for TIM3 (PB5) */
+
+	/* Configure input pins */
+
+#if 0
 	/* Partial pin remap for TIM3 (PB5) */
 	GPIO_PinRemapConfig(GPIO_PartialRemap_TIM3, ENABLE);
 
@@ -88,6 +124,7 @@ void PIOS_HCSR04_Init(void)
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_5;
 	GPIO_Init(GPIOB, &GPIO_InitStructure);
+#endif
 
 	/* Configure timer for input capture */
 	TIM_ICInitStructure.TIM_ICPolarity = TIM_ICPolarity_Rising;
@@ -101,7 +138,7 @@ void PIOS_HCSR04_Init(void)
 	TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
 	TIM_TimeBaseStructInit(&TIM_TimeBaseStructure);
 	TIM_TimeBaseStructure.TIM_Period = 0xFFFF;
-	TIM_TimeBaseStructure.TIM_Prescaler = (PIOS_MASTER_CLOCK / 500000) - 1;
+// 	TIM_TimeBaseStructure.TIM_Prescaler = (PIOS_MASTER_CLOCK / 500000) - 1; // TODO: PIOS_MASTER_CLOCK undefined. ~Stef Louwers, 10-06-2013
 	TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;
 	TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
 	TIM_InternalClockConfig(TIM3);
@@ -119,6 +156,13 @@ void PIOS_HCSR04_Init(void)
 	TIM_ICInitStructure.TIM_ICSelection = TIM_ICSelection_DirectTI;
 	TIM_ICInitStructure.TIM_ICPrescaler = TIM_ICPSC_DIV1;
 	TIM_ICInitStructure.TIM_ICFilter = 0x0;
+
+	int result = xTaskCreate(PIOS_HCSR04_Task, (const signed char *)"pios_hcsr04",
+	                         HCSR04_TASK_STACK, NULL, HCSR04_TASK_PRIORITY,
+	                         &pios_hcsr04_dev->TaskHandle);
+	PIOS_Assert(result == pdPASS);
+
+	return result;
 }
 
 /**
@@ -150,19 +194,15 @@ void PIOS_HCSR04_Trigger(void)
 	TIM_ITConfig(TIM3, TIM_IT_CC2, ENABLE);
 }
 
-
+#if 0
 /**
 * Handle TIM3 global interrupt request
 */
 //void PIOS_PWM_irq_handler(TIM_TypeDef * timer)
 void TIM3_IRQHandler(void)
 {
-	/* Zero value always will be changed but this prevents compiler warning */
-	int32_t i = 0;
-
 	/* Do this as it's more efficient */
 	if (TIM_GetITStatus(TIM3, TIM_IT_CC2) == SET) {
-		i = 7;
 		if (CaptureState == 0) {
 			RiseValue = TIM_GetCapture2(TIM3);
 		} else {
@@ -204,6 +244,12 @@ void TIM3_IRQHandler(void)
 		TIM_ICInit(TIM3, &TIM_ICInitStructure);
 
 	}
+}
+#endif
+
+static void PIOS_HCSR04_Task(void *parameters)
+{
+	// TODO
 }
 
 

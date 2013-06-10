@@ -31,8 +31,23 @@
 #ifndef PIOS_HCSR04_H
 #define PIOS_HCSR04_H
 
+#include "pios_tim_priv.h"
+
+
+// #define PIOS_HCSR04_TRIG_GPIO_PORT 0 // TODO: make this a reasonable value!
+
+struct pios_ultrasonar_trigger {
+	struct stm32_gpio pin;
+};
+
+struct pios_hcsr04_cfg {
+	const struct pios_tim_clock_cfg tim_cfg;
+	const struct pios_tim_channel sonar_tim_channel;
+	const struct pios_ultrasonar_trigger sonar_trigger_pin;
+};
+
 /* Public Functions */
-extern void PIOS_HCSR04_Init(void);
+extern int32_t PIOS_HCSR04_Init(const struct pios_hcsr04_cfg *hcsr04_cfg);
 extern int32_t PIOS_HCSR04_Get(void);
 extern int32_t PIOS_HCSR04_Completed(void);
 extern void PIOS_HCSR04_Trigger(void);
@@ -40,6 +55,6 @@ extern void PIOS_HCSR04_Trigger(void);
 #endif /* PIOS_HCSR04_H */
 
 /** 
-  * @}
-  * @}
-  */
+ * @}
+ * @}
+ */

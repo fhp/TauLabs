@@ -316,8 +316,8 @@ void ModelMapProxy::rowsInserted(const QModelIndex &parent, int first, int last)
     for(int x=first; x<last+1; x++)
     {
         QModelIndex index;
-        WayPointItem * item;
         internals::PointLatLng latlng;
+        WayPointItem *item;
         double altitude;
         index=model->index(x,FlightDataModel::WPDESCRITPTION);
         QString desc=index.data(Qt::DisplayRole).toString();

@@ -41,11 +41,6 @@ ifeq ($(MAKECMDGOALS),me a sandwich)
  endif
 endif
 
-# Make sure this isn't being run as root
-ifeq ($(shell whoami),root)
-$(error You should not be running this as root)
-endif
-
 # Decide on a verbosity level based on the V= parameter
 export AT := @
 
@@ -348,6 +343,25 @@ uavobjects_test: $(UAVOBJ_OUT_DIR) uavobjgenerator
 uavobjects_clean:
 	$(V0) @echo " CLEAN      $@"
 	$(V1) [ ! -d "$(UAVOBJ_OUT_DIR)" ] || $(RM) -r "$(UAVOBJ_OUT_DIR)"
+
+##############################
+#
+# Global Control related components
+#
+##############################
+
+.PHONY: globalcontrol
+globalcontrol: uavobjects_gcs
+	$(V1) mkdir -p $(BUILD_DIR)/ground/globalcontrol
+	$(V1) ( cd $(BUILD_DIR)/ground/globalcontrol && \
+	  $(QMAKE) $(ROOT_DIR)/ground/globalcontrol/globalcontrol.pro -spec $(QT_SPEC) -r CONFIG+="$(GCS_BUILD_CONF) $(GCS_SILENT)" $(GCS_QMAKE_OPTS) && \
+	  $(MAKE) -w ; \
+	)
+
+.PHONY: globalcontrol_clean
+globalcontrol_clean:
+	$(V0) @echo " CLEAN      $@"
+	$(V1) [ ! -d "$(BUILD_DIR)/ground/globalcontrol" ] || $(RM) -r "$(BUILD_DIR)/ground/globalcontrol"
 
 ##############################
 #

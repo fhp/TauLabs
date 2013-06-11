@@ -45,15 +45,14 @@ void UAVObjectsPlugin::extensionsInitialized()
 
 bool UAVObjectsPlugin::initialize(const QStringList & arguments, QString * errorString)
 {
-    Q_UNUSED(arguments);
-    Q_UNUSED(errorString);
-    
     // Create object manager and expose object
     UAVObjectManager* objMngr = new UAVObjectManager();
     addAutoReleasedObject(objMngr);
     // Initialize UAVObjects
     UAVObjectsInitialize(objMngr);
     // Done
+    Q_UNUSED(arguments);
+    Q_UNUSED(errorString);
     return true;
 }
 

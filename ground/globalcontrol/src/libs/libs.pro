@@ -5,5 +5,6 @@ SUBDIRS  += \
     aggregation \
     extensionsystem \
     utils \
+    qtconcurrent \
     qextserialport \
     libqxt

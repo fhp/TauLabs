@@ -42,47 +42,47 @@ void QtSingleApplication::sysInit(const QString &appId)
 }
 
 
-QtSingleApplication::QtSingleApplication(int &argc, char **argv, bool GUIenabled)
-    : QApplication(argc, argv, GUIenabled)
+QtSingleApplication::QtSingleApplication(int &argc, char **argv)
+    : QCoreApplication(argc, argv)
 {
     sysInit();
 }
 
 
-QtSingleApplication::QtSingleApplication(const QString &appId, int &argc, char **argv)
-    : QApplication(argc, argv)
-{
-    sysInit(appId);
-}
+// QtSingleApplication::QtSingleApplication(const QString &appId, int &argc, char **argv)
+//     : QApplication(argc, argv)
+// {
+//     sysInit(appId);
+// }
 
 
-QtSingleApplication::QtSingleApplication(int &argc, char **argv, Type type)
-    : QApplication(argc, argv, type)
-{
-    sysInit();
-}
-
-
-#if defined(Q_WS_X11)
-QtSingleApplication::QtSingleApplication(Display* dpy, Qt::HANDLE visual, Qt::HANDLE colormap)
-    : QApplication(dpy, visual, colormap)
-{
-    sysInit();
-}
-
-QtSingleApplication::QtSingleApplication(Display *dpy, int &argc, char **argv, Qt::HANDLE visual, Qt::HANDLE cmap)
-    : QApplication(dpy, argc, argv, visual, cmap)
-{
-    sysInit();
-}
-
-QtSingleApplication::QtSingleApplication(Display* dpy, const QString &appId,
-    int argc, char **argv, Qt::HANDLE visual, Qt::HANDLE colormap)
-    : QApplication(dpy, argc, argv, visual, colormap)
-{
-    sysInit(appId);
-}
-#endif
+// // QtSingleApplication::QtSingleApplication(int &argc, char **argv, Type type)
+// //     : QApplication(argc, argv, type)
+// // {
+// //     sysInit();
+// // }
+// // 
+// // 
+// // #if defined(Q_WS_X11)
+// // QtSingleApplication::QtSingleApplication(Display* dpy, Qt::HANDLE visual, Qt::HANDLE colormap)
+// //     : QApplication(dpy, visual, colormap)
+// // {
+// //     sysInit();
+// // }
+// // 
+// // QtSingleApplication::QtSingleApplication(Display *dpy, int &argc, char **argv, Qt::HANDLE visual, Qt::HANDLE cmap)
+// //     : QApplication(dpy, argc, argv, visual, cmap)
+// // {
+// //     sysInit();
+// // }
+// // 
+// // QtSingleApplication::QtSingleApplication(Display* dpy, const QString &appId,
+// //     int argc, char **argv, Qt::HANDLE visual, Qt::HANDLE colormap)
+// //     : QApplication(dpy, argc, argv, visual, colormap)
+// // {
+// //     sysInit(appId);
+// // }
+// // #endif
 
 bool QtSingleApplication::event(QEvent *event)
 {
@@ -91,7 +91,7 @@ bool QtSingleApplication::event(QEvent *event)
         emit fileOpenRequest(foe->file());
         return true;
     }
-    return QApplication::event(event);
+    return QCoreApplication::event(event);
 }
 
 bool QtSingleApplication::isRunning()

@@ -26,24 +26,24 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include <QtGui/QApplication>
+#include <QCoreApplication>
 
 namespace SharedTools {
 
 class QtLocalPeer;
 
-class QtSingleApplication : public QApplication
+class QtSingleApplication : public QCoreApplication
 {
     Q_OBJECT
 
 public:
-    QtSingleApplication(int &argc, char **argv, bool GUIenabled = true);
-    QtSingleApplication(const QString &id, int &argc, char **argv);
-    QtSingleApplication(int &argc, char **argv, Type type);
-#if defined(Q_WS_X11)
-    QtSingleApplication(Display *dpy, Qt::HANDLE visual = 0, Qt::HANDLE colormap = 0);
-    QtSingleApplication(Display *dpy, int &argc, char **argv, Qt::HANDLE visual = 0, Qt::HANDLE cmap = 0);
-#endif
+    QtSingleApplication(int &argc, char **argv);
+//     QtSingleApplication(const QString &id, int &argc, char **argv);
+//     QtSingleApplication(int &argc, char **argv, Type type);
+// #if defined(Q_WS_X11)
+//     QtSingleApplication(Display *dpy, Qt::HANDLE visual = 0, Qt::HANDLE colormap = 0);
+//     QtSingleApplication(Display *dpy, int &argc, char **argv, Qt::HANDLE visual = 0, Qt::HANDLE cmap = 0);
+// #endif
 
     bool isRunning();
     QString id() const;
@@ -62,9 +62,9 @@ public:
     void initialize(bool = true)
         { isRunning(); }
 
-#if defined(Q_WS_X11)
-    QtSingleApplication(Display* dpy, const QString &id, int argc, char **argv, Qt::HANDLE visual = 0, Qt::HANDLE colormap = 0);
-#endif
+// #if defined(Q_WS_X11)
+//     QtSingleApplication(Display* dpy, const QString &id, int argc, char **argv, Qt::HANDLE visual = 0, Qt::HANDLE colormap = 0);
+// #endif
 // end obsolete methods
 
 Q_SIGNALS:

@@ -150,7 +150,7 @@ static inline QStringList getPluginPaths()
 {
     QStringList rc;
     // Figure out root:  Up one from 'bin'
-    QDir rootDir = QApplication::applicationDirPath();
+    QDir rootDir = QCoreApplication::applicationDirPath();
     rootDir.cdUp();
     const QString rootDirPath = rootDir.canonicalPath();
     // 1) "plugins" (Win/Linux)
@@ -202,7 +202,7 @@ static void overrideSettings(QSettings &settings, int argc, char **argv){
 
 int main(int argc, char **argv)
 {
-    SharedTools::QtSingleApplication app(argc, argv, true);
+    SharedTools::QtSingleApplication app(argc, argv);
 
     QString locale = QLocale::system().name();
 

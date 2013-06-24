@@ -56,6 +56,10 @@ bool DemoPlugin::initialize(const QStringList& args, QString *errMsg)
         qDebug() << "Error: Object is unknown (AttitudeActual).";
     }
     
+//     UAVDataObject* obj = dynamic_cast<UAVDataObject*>( objManager->getObject(QString("FlightStatus")) );
+//     obj->getField("Armed")->setValue("Disarmed");
+//     obj->updated();
+    
     return true;
 }
 

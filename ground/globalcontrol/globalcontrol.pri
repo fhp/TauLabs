@@ -87,10 +87,10 @@ macx {
 } else {
     win32 {
         contains(TEMPLATE, vc.*)|contains(TEMPLATE_PREFIX, vc):vcproj = 1
-        GCS_APP_TARGET   = taulabsgcs
+        GCS_APP_TARGET   = globalcontrol
     } else {
-        GCS_APP_WRAPPER  = taulabsgcs
-        GCS_APP_TARGET   = taulabsgcs.bin
+        GCS_APP_WRAPPER  = globalcontrol
+        GCS_APP_TARGET   = globalcontrol.bin
     }
     GCS_LIBRARY_PATH = $$GCS_BUILD_TREE/$$GCS_LIBRARY_BASENAME/taulabs
     GCS_PLUGIN_PATH  = $$GCS_LIBRARY_PATH/plugins

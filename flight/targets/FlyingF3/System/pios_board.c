@@ -1115,6 +1115,12 @@ void PIOS_Board_Init(void) {
 #endif
 		break;
 	case HWFLYINGF3_SHIELD_NONE:
+// #if defined(PIOS_INCLUDE_ADC)
+//                 //Sanity check, this is to ensure that no one changes the adc_pins array without changing the defines
+//                 if (PIOS_INTERNAL_ADC_Init(&internal_adc_id, &internal_adc_cfg) < 0)
+//                         PIOS_Assert(0);
+//                 PIOS_ADC_Init(&pios_internal_adc_id, &pios_internal_adc_driver, internal_adc_id);
+// #endif
 		break;
 	default:
 		PIOS_Assert(0);

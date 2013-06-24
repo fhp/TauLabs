@@ -104,14 +104,16 @@ int32_t PIOS_ADC_Init(uintptr_t *adc_id, const struct pios_adc_driver *driver, u
 {
 	PIOS_Assert(adc_id);
 	PIOS_Assert(driver);
-	if (sub_device_list.number_of_devices >= PIOS_ADC_SUB_DRIVER_MAX_INSTANCES)
+	if (sub_device_list.number_of_devices >= PIOS_ADC_SUB_DRIVER_MAX_INSTANCES) {
 		return -1;
+        }
 	struct pios_adc_dev * adc_dev;
 
 	adc_dev = (struct pios_adc_dev *) PIOS_ADC_Allocate();
 
-	if (!adc_dev)
-		return -1;
+	if (!adc_dev) {
+            return -1;
+        }
 
 	adc_dev->driver = driver;
 	adc_dev->lower_id = lower_id;

@@ -2203,6 +2203,39 @@ static const struct pios_internal_adc_cfg internal_adc_cfg_rcflyer_shield = {
 	.number_of_used_pins = 2,
 	.adc_pins = (struct adc_pin[]){{GPIOC,GPIO_Pin_3,ADC_Channel_9,true},{GPIOC,GPIO_Pin_4,ADC_Channel_5,false},},
 };
+
+// static const struct pios_internal_adc_cfg internal_adc_cfg = {
+//         .dma = {
+//                 .irq = {
+//                         .flags   = (DMA_IT_TC | DMA_IT_HT | DMA_IT_TE),
+//                         .init    = {
+//                         .NVIC_IRQChannel                   = DMA1_Channel1_IRQn,
+//                         .NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGH,
+//                         .NVIC_IRQChannelSubPriority        = 0,
+//                         .NVIC_IRQChannelCmd                = ENABLE,
+//                         },
+//                 },
+//                 .rx = {
+//                         .channel = DMA1_Channel1,
+//                         .init    = {
+//                         .DMA_Priority           = DMA_Priority_High,
+//                         },
+//                 }
+//         },
+//         .half_flag = DMA1_IT_HT1,
+//         .full_flag = DMA1_IT_TC1,
+//         .oversampling = 32,
+//         .adc_dev_master = ADC1,
+//         .adc_dev_slave = ADC2,
+//         .number_of_used_pins = 4,
+//         .adc_pins = (struct adc_pin[]){
+//             {GPIOC,GPIO_Pin_0,ADC_Channel_1,true},
+//             {GPIOC,GPIO_Pin_1,ADC_Channel_2,true},
+//             {GPIOC,GPIO_Pin_2,ADC_Channel_3,true},
+//             {GPIOC,GPIO_Pin_3,ADC_Channel_4,true},
+//         },
+// };
+
 #endif //PIOS_INCLUDE_ADC
 
 /**

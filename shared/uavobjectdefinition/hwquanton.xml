@@ -3,7 +3,6 @@
 		<description>Selection of optional hardware configurations.</description>
 
 		<field name="RcvrPort" units="function" type="enum" elements="1" options="Disabled,PWM,PWM+ADC,PPM,PPM+ADC,PPM+PWM,PPM+PWM+ADC,PPM+Outputs,PPM+Outputs+ADC,Outputs,Outputs+ADC" defaultvalue="PWM"/>
-
 		<field name="Uart1" units="function" type="enum" elements="1"  defaultvalue="Disabled">
 			<options>
 				<option>Disabled</option>
@@ -17,6 +16,7 @@
 				<option>ComBridge</option>
 				<option>MavLinkTX</option>
 				<option>MavLinkTX_GPS_RX</option>
+				<option>HCSR04</option>
 				<option>HoTT SUMD</option>
 				<option>HoTT SUMH</option>
 			</options>

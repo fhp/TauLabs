@@ -76,7 +76,6 @@ static uint32_t idleCounterClear;
 static xTaskHandle systemTaskHandle;
 static xQueueHandle objectPersistenceQueue;
 static bool stackOverflow;
-static bool mallocFailed;
 
 // Private functions
 static void objectUpdatedCb(UAVObjEvent * ev);
@@ -100,7 +99,6 @@ int32_t SystemModStart(void)
 {
 	// Initialize vars
 	stackOverflow = false;
-	mallocFailed = false;
 	// Create system task
 	xTaskCreate(systemTask, (signed char *)"System", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &systemTaskHandle);
 	// Register task
@@ -125,7 +123,9 @@ int32_t SystemModInitialize(void)
 	TaskInfoInitialize();
 #endif
 #if defined(I2C_WDG_STATS_DIAGNOSTICS)
+#if defined(PIOS_INCLUDE_I2C)
 	I2CStatsInitialize();
+#endif
 	WatchdogStatusInitialize();
 #endif
 
@@ -147,7 +147,7 @@ static void systemTask(void *parameters)
 	/* create all modules thread */
 	MODULE_TASKCREATE_ALL;
 
-	if (mallocFailed) {
+	if (PIOS_heap_malloc_failed_p()) {
 		/* We failed to malloc during task creation,
 		 * system behaviour is undefined.  Reset and let
 		 * the BootFault code recover for us.
@@ -215,8 +215,8 @@ static void systemTask(void *parameters)
 
 		UAVObjEvent ev;
 		int delayTime = flightStatus.Armed == FLIGHTSTATUS_ARMED_ARMED ?
-			SYSTEM_UPDATE_PERIOD_MS / portTICK_RATE_MS / (LED_BLINK_RATE_HZ * 2) :
-			SYSTEM_UPDATE_PERIOD_MS / portTICK_RATE_MS;
+			MS2TICKS(SYSTEM_UPDATE_PERIOD_MS) / (LED_BLINK_RATE_HZ * 2) :
+			MS2TICKS(SYSTEM_UPDATE_PERIOD_MS);
 
 		if(xQueueReceive(objectPersistenceQueue, &ev, delayTime) == pdTRUE) {
 			// If object persistence is updated call the callback
@@ -414,7 +414,7 @@ static void updateStats()
 
 	// Get stats and update
 	SystemStatsGet(&stats);
-	stats.FlightTime = xTaskGetTickCount() * portTICK_RATE_MS;
+	stats.FlightTime = TICKS2MS(xTaskGetTickCount());
 #if defined(ARCH_POSIX) || defined(ARCH_WIN32)
 	// POSIX port of FreeRTOS doesn't have xPortGetFreeHeapSize()
 	stats.HeapRemaining = 10240;
@@ -432,11 +432,11 @@ static void updateStats()
 
 	portTickType now = xTaskGetTickCount();
 	if (now > lastTickCount) {
-		uint32_t dT = (xTaskGetTickCount() - lastTickCount) * portTICK_RATE_MS;	// in ms
+		float dT = TICKS2MS(xTaskGetTickCount() - lastTickCount) / 1000.0f;
 
 		// In the case of a slightly miscalibrated max idle count, make sure CPULoad does
 		// not go negative and set an alarm inappropriately.
-		float idleFraction = ((float)idleCounter / ((float)dT / 1000.0f)) / (float)IDLE_COUNTS_PER_SEC_AT_NO_LOAD;
+		float idleFraction = ((float)idleCounter / dT) / (float)IDLE_COUNTS_PER_SEC_AT_NO_LOAD;
 		if (idleFraction > 1)
 			stats.CPULoad = 0;
 		else
@@ -465,7 +465,7 @@ static void updateSystemAlarms()
 	SystemStatsGet(&stats);
 
 	// Check heap, IRQ stack and malloc failures
-	if ( mallocFailed
+	if (PIOS_heap_malloc_failed_p()
 	     || (stats.HeapRemaining < HEAP_LIMIT_CRITICAL)
 #if !defined(ARCH_POSIX) && !defined(ARCH_WIN32) && defined(CHECK_IRQ_STACK)
 	     || (stats.IRQStackRemaining < IRQSTACK_LIMIT_CRITICAL)
@@ -543,20 +543,6 @@ void vApplicationStackOverflowHook(xTaskHandle * pxTask, signed portCHAR * pcTas
 {
 	stackOverflow = true;
 #if DEBUG_STACK_OVERFLOW
-	static volatile bool wait_here = true;
-	while(wait_here);
-	wait_here = true;
-#endif
-}
-
-/**
- * Called by the RTOS when a malloc call fails.
- */
-#define DEBUG_MALLOC_FAILURES 0
-void vApplicationMallocFailedHook(void)
-{
-	mallocFailed = true;
-#if DEBUG_MALLOC_FAILURES
 	static volatile bool wait_here = true;
 	while(wait_here);
 	wait_here = true;

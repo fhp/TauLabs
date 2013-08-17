@@ -8,6 +8,7 @@
  *
  * @file       pios_i2c.c  
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+ * @author     Tau Labs, http://taulabs.org, Copyright (C) 2013
  * @brief      I2C Enable/Disable routines
  * @see        The GNU Public License (GPL) Version 3
  * 
@@ -838,35 +839,16 @@ static bool PIOS_I2C_validate(struct pios_i2c_adapter * i2c_adapter)
 	return (i2c_adapter->magic == PIOS_I2C_DEV_MAGIC);
 }
 
-#if defined(PIOS_INCLUDE_FREERTOS)
 static struct pios_i2c_adapter * PIOS_I2C_alloc(void)
 {
 	struct pios_i2c_adapter * i2c_adapter;
 
-	i2c_adapter = (struct pios_i2c_adapter *)pvPortMalloc(sizeof(*i2c_adapter));
+	i2c_adapter = (struct pios_i2c_adapter *)PIOS_malloc(sizeof(*i2c_adapter));
 	if (!i2c_adapter) return(NULL);
 
 	i2c_adapter->magic = PIOS_I2C_DEV_MAGIC;
 	return(i2c_adapter);
 }
-#else
-static struct pios_i2c_adapter pios_i2c_adapters[PIOS_I2C_MAX_DEVS];
-static uint8_t pios_i2c_num_adapters;
-static struct pios_i2c_adapter * PIOS_I2C_alloc(void)
-{
-	struct pios_i2c_adapter * i2c_adapter;
-
-	if (pios_i2c_num_adapters >= PIOS_I2C_MAX_DEVS) {
-		return (NULL);
-	}
-
-	i2c_adapter = &pios_i2c_adapters[pios_i2c_num_adapters++];
-	i2c_adapter->magic = PIOS_I2C_DEV_MAGIC;
-
-	return (i2c_adapter);
-}
-#endif
-
 
 /**
 * Initializes IIC driver
@@ -1004,7 +986,7 @@ int32_t PIOS_I2C_Transfer(uint32_t i2c_id, const struct pios_i2c_txn txn_list[],
 #ifdef USE_FREERTOS
 	/* Lock the bus */
 	portTickType timeout;
-	timeout = i2c_adapter->cfg->transfer_timeout_ms / portTICK_RATE_MS;
+	timeout = MS2TICKS(i2c_adapter->cfg->transfer_timeout_ms);
 	if (xSemaphoreTake(i2c_adapter->sem_busy, timeout) == pdFALSE)
 		return -2;
 #else
@@ -1140,7 +1122,7 @@ void PIOS_I2C_EV_IRQ_Handler(uint32_t i2c_id)
 	case 0x80:		/* TxE only.  TRA + MSL + BUSY have been cleared before we got here. */
 		/* Ignore */
 		{
-			static volatile bool halt = FALSE;
+			static volatile bool halt = false;
 			while (halt) ;
 		}
 		break;

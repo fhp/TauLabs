@@ -57,14 +57,15 @@
 #define DEG_LAT2NM                     (1.0/60.f) // 1 degree latitude per 60 nautical miles
 
 // Standard atmospheric constants
-#define UNIVERSAL_GAS_CONSTANT          8.31447f //[J/(mol·K)]
-#define DRY_AIR_CONSTANT                287.058f //[J/(kg*K)]
-#define STANDARD_AIR_DENSITY              1.225f //[kg/m^3]
-#define STANDARD_AIR_LAPSE_RATE          0.0065f //[deg/m]
-#define STANDARD_AIR_MOLS2KG          0.0289644f //[kg/mol]
-#define STANDARD_AIR_RELATIVE_HUMIDITY     20.0f //[%]
-#define STANDARD_AIR_SEA_LEVEL_PRESSURE 101.325f //[kPa]
+#define UNIVERSAL_GAS_CONSTANT           8.31447f // [J/(mol·K)]
+#define DRY_AIR_CONSTANT                 287.058f // [J/(kg*K)]
+#define STANDARD_AIR_DENSITY               1.225f // [kg/m^3]
+#define STANDARD_AIR_LAPSE_RATE           0.0065f // [deg/m]
+#define STANDARD_AIR_MOLS2KG           0.0289644f // [kg/mol]
+#define STANDARD_AIR_RELATIVE_HUMIDITY      20.0f // [%]
+#define STANDARD_AIR_SEA_LEVEL_PRESSURE 101325.0f // [Pa]
 #define STANDARD_AIR_TEMPERATURE (15.0f + CELSIUS2KELVIN) // Standard temperatue in [K]
+#define STANDARD_AIR_MACH_SPEED           340.27f //speed of sound at standard sea level in [m/s]
 
 // WGS-84 definitions (from http://home.online.no/~sigurdhu/WGS84_Eng.html)
 #define WGS84_RADIUS_EARTH_KM          6371.008f  // Earth's radius in km

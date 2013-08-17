@@ -46,15 +46,15 @@ bool DemoPlugin::initialize(const QStringList& args, QString *errMsg)
     Q_UNUSED(args);
     Q_UNUSED(errMsg);
     
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
-    
-    attitudeObj = dynamic_cast<UAVDataObject*>(objManager->getObject("AttitudeActual"));
-    if (attitudeObj != NULL) {
-        connect(attitudeObj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(updateAttitude(UAVObject*)));
-    } else {
-        qDebug() << "Error: Object is unknown (AttitudeActual).";
-    }
+//     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+//     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
+//     
+//     attitudeObj = dynamic_cast<UAVDataObject*>(objManager->getObject("AttitudeActual"));
+//     if (attitudeObj != NULL) {
+//         connect(attitudeObj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(updateAttitude(UAVObject*)));
+//     } else {
+//         qDebug() << "Error: Object is unknown (AttitudeActual).";
+//     }
     
 //     UAVDataObject* obj = dynamic_cast<UAVDataObject*>( objManager->getObject(QString("FlightStatus")) );
 //     obj->getField("Armed")->setValue("Disarmed");

@@ -5,12 +5,6 @@ TEMPLATE  = subdirs
 
 SUBDIRS   = plugin_coreplugin
 
-# Blank Template Plugin, not compiled by default
-SUBDIRS += plugin_demo
-plugin_demo.subdir = demo
-plugin_demo.depends = plugin_coreplugin
-plugin_demo.depends = plugin_uavobjects
-
 # Core plugin
 plugin_coreplugin.subdir = coreplugin
 # Empty UAVGadget - Default for new splits
@@ -22,6 +16,17 @@ plugin_coreplugin.subdir = coreplugin
 # plugin_welcome.subdir = welcome
 # plugin_welcome.depends = plugin_coreplugin
 # SUBDIRS += plugin_welcome
+
+# Blank Template Plugin, not compiled by default
+SUBDIRS += plugin_demo
+plugin_demo.subdir = demo
+plugin_demo.depends = plugin_coreplugin
+plugin_demo.depends = plugin_uavobjects
+
+SUBDIRS += plugin_video
+plugin_video.subdir = video
+plugin_video.depends = plugin_coreplugin
+plugin_video.depends = plugin_uavobjects
 
 # RawHID connection plugin
 SUBDIRS += plugin_rawhid

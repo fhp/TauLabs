@@ -28,6 +28,11 @@ plugin_video.subdir = video
 plugin_video.depends = plugin_coreplugin
 plugin_video.depends = plugin_uavobjects
 
+SUBDIRS += plugin_altitude
+plugin_altitude.subdir = altitude
+plugin_altitude.depends = plugin_coreplugin
+plugin_altitude.depends = plugin_uavobjects
+
 # RawHID connection plugin
 SUBDIRS += plugin_rawhid
 plugin_rawhid.subdir = rawhid
